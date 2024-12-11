@@ -1,7 +1,6 @@
-from app import app, db
 from flask import request, jsonify
 from models import Friend
-
+from app import db, app
 
 # Get all friends
 @app.route("/api/friends", methods=["GET"])
@@ -12,7 +11,6 @@ def get_friends():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 # Create a friend
 @app.route("/api/friends", methods=["POST"])
@@ -43,11 +41,10 @@ def create_friend():
         db.session.add(new_friend)
         db.session.commit()
 
-        return jsonify(new_friend.to_json()), 201  # Return the new friend with its ID
+        return jsonify(new_friend.to_json()), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
-
 
 # Delete a friend
 @app.route("/api/friends/<int:id>", methods=["DELETE"])
@@ -64,7 +61,6 @@ def delete_friend(id):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-
 # Update a friend's profile
 @app.route("/api/friends/<int:id>", methods=["PATCH"])
 def update_friend(id):
@@ -80,7 +76,6 @@ def update_friend(id):
         friend.description = data.get("description", friend.description)
         friend.gender = data.get("gender", friend.gender)
 
-        # Optionally update the avatar URL if the name or gender changes
         if "name" in data or "gender" in data:
             if friend.gender == "male":
                 friend.img_url = f"https://avatar.iran.liara.run/public/boy?username={friend.name}"
